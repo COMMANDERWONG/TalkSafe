@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "264117317908",
+    "firebase_url": "https://talksafe-26885-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "talksafe-26885",
+    "storage_bucket": "talksafe-26885.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:264117317908:android:1547137ce1ea5811cd5201",
+        "android_client_info": {
+          "package_name": "com.example.talksafe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "264117317908-df4d7v8942vkcg7v7fu6cecd1mic83ht.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1WIH8F_H8wIT4VUtHkD0_LCLC04qUdFI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "264117317908-df4d7v8942vkcg7v7fu6cecd1mic83ht.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
