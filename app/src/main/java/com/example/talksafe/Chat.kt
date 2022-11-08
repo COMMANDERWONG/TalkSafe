@@ -1,13 +1,18 @@
 package com.example.talksafe
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+
 
 class Chat : AppCompatActivity() {
     private lateinit var chatView: RecyclerView
@@ -16,6 +21,7 @@ class Chat : AppCompatActivity() {
     private lateinit var msgAdapter: MessageAdapter
     private lateinit var msgList: ArrayList<Message>
     private lateinit var mDbRef: DatabaseReference
+    private lateinit var mAuth: FirebaseAuth
 
     var receiverRoom: String? = null
     var senderRoom: String? = null
@@ -38,6 +44,7 @@ class Chat : AppCompatActivity() {
         chatView = findViewById(R.id.chat_view)
         msgBox = findViewById(R.id.msg_box)
         sendBtn = findViewById(R.id.send_btn)
+        mAuth = FirebaseAuth.getInstance()
         msgList = ArrayList()
         msgAdapter = MessageAdapter(this, msgList)
 
@@ -75,4 +82,37 @@ class Chat : AppCompatActivity() {
             msgBox.setText("")
         }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.chat_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId ){
+            R.id.removeChat ->{
+                mDbRef.child("chat").child(senderRoom!!).child("messages").removeValue()
+                mDbRef.child("chat").child(receiverRoom!!).child("messages").removeValue()
+                Toast.makeText(
+                    this@Chat,
+                    "All messages deleted",
+                    Toast.LENGTH_SHORT
+                ).show()
+                val intent = Intent(this@Chat, MainActivity::class.java)
+                finish()
+                startActivity(intent)
+            }
+            R.id.logout -> {
+                mAuth.signOut()
+                val intent = Intent(this@Chat, LogIn::class.java)
+                finish()
+                startActivity(intent)
+                return true
+            }
+        }
+
+        return true
+    }
+
+
 }

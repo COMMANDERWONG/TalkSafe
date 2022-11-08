@@ -32,34 +32,50 @@ class SignUp : AppCompatActivity() {
             val name = tUsername.text.toString()
             val email = tEmail.text.toString()
             val password = tPassword.text.toString()
-            val friendList:ArrayList<String> = ArrayList()
-            signUp(name, email, password,friendList)
+            var validPassword = true
+            if (password.length<6) {
+                validPassword = false
+            }
+            signUp(name, email, password,validPassword)
         }
 
 
     }
 
-    private fun signUp(name: String, email: String, password: String, friendList:ArrayList<String>) {
+    private fun signUp(name: String, email: String, password: String, validPassword: Boolean) {
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, jump to home
-                    addToDatabase(name, email, mAuth.currentUser?.uid!!)
-                    val intent = Intent(this@SignUp, MainActivity::class.java)
-                    finish()
-                    startActivity(intent)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Toast.makeText(
-                        this@SignUp,
-                        "Error occurred, Please try again later",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-
+        if(name.isNotEmpty()&& email.isNotEmpty()&&password.isNotEmpty()) {
+            mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        // Sign in success, jump to home
+                        addToDatabase(name, email, mAuth.currentUser?.uid!!)
+                        val intent = Intent(this@SignUp, MainActivity::class.java)
+                        finish()
+                        startActivity(intent)
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Toast.makeText(
+                            this@SignUp,
+                            "Error occurred, Please try again later",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    if (!validPassword) {
+                        Toast.makeText(
+                            this@SignUp,
+                            "Password must be at least 6 digits",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-            }
+        }else{
+            Toast.makeText(
+                this@SignUp,
+                "Empty Fields Are Not Allowed !!",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun addToDatabase(name: String, email: String, uid: String) {

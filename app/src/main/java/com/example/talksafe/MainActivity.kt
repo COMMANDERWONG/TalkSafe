@@ -115,19 +115,35 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu, menu)
+        menuInflater.inflate(R.menu.main_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.logout) {
-            mAuth.signOut()
-            val intent = Intent(this@MainActivity, LogIn::class.java)
-            finish()
-            startActivity(intent)
-            return true
+        when (item.itemId) {
+            R.id.logout -> {
+                mAuth.signOut()
+                val intent = Intent(this@MainActivity, LogIn::class.java)
+                finish()
+                startActivity(intent)
+                return true
+            }
+            R.id.removeAllFd -> {
+                removeAllFriends()
+                val intent = Intent(this@MainActivity, MainActivity::class.java)
+                finish()
+                startActivity(intent)
+                return true
+            }
         }
+
+
         return true
+    }
+
+    private fun removeAllFriends() {
+        mDbRef.child("user").child(mAuth.uid!!).child("friends")
+            .removeValue()
     }
 
     private fun getFriends() {
@@ -139,6 +155,7 @@ class MainActivity : AppCompatActivity() {
                         val currentUser = ps.getValue(User::class.java)
                         userList.add(currentUser!!)
                     }
+                    adapter.notifyDataSetChanged()
                 }
 
                 override fun onCancelled(error: DatabaseError) {
