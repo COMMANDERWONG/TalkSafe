@@ -77,7 +77,8 @@ class MainActivity : AppCompatActivity() {
                                                 this@MainActivity,
                                                 "Friend " + currentUser.name + " added to your friend list successfully",
                                                 Toast.LENGTH_SHORT
-                                            ).show()
+                                            )
+                                                .show()
                                             adapter.notifyDataSetChanged()
                                         }
 
