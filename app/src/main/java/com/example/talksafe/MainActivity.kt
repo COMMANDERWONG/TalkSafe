@@ -20,7 +20,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mAuth: FirebaseAuth
     private lateinit var mDbRef: DatabaseReference
     private lateinit var tEmail: EditText
-    private lateinit var btnSearch:Button
+    private lateinit var btnSearch: Button
+//    private lateinit var friendList: ArrayList<User>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,35 +35,78 @@ class MainActivity : AppCompatActivity() {
         btnSearch = findViewById(R.id.btn_search)
         userView.layoutManager = LinearLayoutManager(this)
         userView.adapter = adapter
+        userList.clear()
+        getFriends()
         btnSearch.setOnClickListener {
             val email = tEmail.text.toString()
-            if (email == "") {
-                Toast.makeText(this@MainActivity, "Please enter user email", Toast.LENGTH_SHORT)
-                    .show()
-            } else {
-                mDbRef.child("user").addValueEventListener(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        var userExist = false
-                        for(ps in snapshot.children){
-                            val currentUser = ps.getValue(User::class.java)
-                            if (currentUser?.email == email) {
-                                userList.add(currentUser!!)
-                                userExist = true
-                            }
-                        }
-                        if(userExist){
-                            adapter.notifyDataSetChanged()
-                        } else {
-                            Toast.makeText(this@MainActivity, "No user found with this email", Toast.LENGTH_SHORT)
-                                .show()
-                        }
+            when (email) {
+                "" -> {
+                    Toast.makeText(this@MainActivity, "Please enter user email", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                mAuth.currentUser?.email -> {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "You can't add yourself as a friend",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
+                else -> {
+                    mDbRef.child("user")
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                var exist = false
+                                for (ps in snapshot.children) {
+                                    val currentUser = ps.getValue(User::class.java)
+                                    if (currentUser?.email == email) {
+                                        exist = true
+                                        if (friendExists(currentUser.uid!!)) {
+                                            Toast.makeText(
+                                                this@MainActivity,
+                                                "Friend " + currentUser.name + " is already in your friend list",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                                .show()
+                                            break
+                                        } else {
+                                            userList.add(currentUser)
+                                            mDbRef.child("user").child(mAuth.uid!!).child("friends")
+                                                .setValue(userList)
+                                            Toast.makeText(
+                                                this@MainActivity,
+                                                "Friend " + currentUser.name + " added to your friend list successfully",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            adapter.notifyDataSetChanged()
+                                        }
 
-                    }
-                    override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(this@MainActivity, "Database Error", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                })
+                                    }
+
+                                }
+                                if (!exist) {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        "No user found with this email",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
+                                }
+
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Database Error",
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
+
+                        })
+
+                }
             }
         }
 
@@ -85,8 +129,33 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-//    private fun getFriends(userList: ArrayList<User>){
-//
-//        userList.add()
-//    }
+    private fun getFriends() {
+        mDbRef.child("user").child(mAuth.uid!!).child("friends")
+            .addListenerForSingleValueEvent(object :
+                ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (ps in snapshot.children) {
+                        val currentUser = ps.getValue(User::class.java)
+                        userList.add(currentUser!!)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+            })
+    }
+
+    private fun friendExists(uid: String): Boolean {
+        var exist = false
+
+        for (ps in userList) {
+            if (ps.uid == uid) {
+                exist = true
+                break
+            }
+        }
+        return exist
+    }
+
+
 }
