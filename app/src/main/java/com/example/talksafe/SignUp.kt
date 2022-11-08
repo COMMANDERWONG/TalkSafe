@@ -32,13 +32,14 @@ class SignUp : AppCompatActivity() {
             val name = tUsername.text.toString()
             val email = tEmail.text.toString()
             val password = tPassword.text.toString()
-            signUp(name, email, password)
+            val friendList:ArrayList<String> = ArrayList()
+            signUp(name, email, password,friendList)
         }
 
 
     }
 
-    private fun signUp(name: String, email: String, password: String) {
+    private fun signUp(name: String, email: String, password: String, friendList:ArrayList<String>) {
 
         mAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
