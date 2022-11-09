@@ -89,8 +89,8 @@ class Chat : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId ){
-            R.id.removeChat ->{
+        when (item.itemId) {
+            R.id.removeChat -> {
                 mDbRef.child("chat").child(senderRoom!!).child("messages").removeValue()
                 mDbRef.child("chat").child(receiverRoom!!).child("messages").removeValue()
                 Toast.makeText(

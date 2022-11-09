@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mDbRef: DatabaseReference
     private lateinit var tEmail: EditText
     private lateinit var btnSearch: Button
-//    private lateinit var friendList: ArrayList<User>
+    private lateinit var btnRemove: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,82 +33,72 @@ class MainActivity : AppCompatActivity() {
         userView = findViewById(R.id.user_view)
         tEmail = findViewById(R.id.t_email)
         btnSearch = findViewById(R.id.btn_search)
+        btnRemove = findViewById(R.id.btn_remove)
         userView.layoutManager = LinearLayoutManager(this)
         userView.adapter = adapter
         userList.clear()
         getFriends()
         btnSearch.setOnClickListener {
             val email = tEmail.text.toString()
-            when (email) {
-                "" -> {
-                    Toast.makeText(this@MainActivity, "Please enter user email", Toast.LENGTH_SHORT)
-                        .show()
-                }
-                mAuth.currentUser?.email -> {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "You can't add yourself as a friend",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                }
-                else -> {
-                    mDbRef.child("user")
-                        .addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                                var exist = false
-                                for (ps in snapshot.children) {
-                                    val currentUser = ps.getValue(User::class.java)
-                                    if (currentUser?.email == email) {
-                                        exist = true
-                                        if (friendExists(currentUser.uid!!)) {
-                                            Toast.makeText(
-                                                this@MainActivity,
-                                                "Friend " + currentUser.name + " is already in your friend list",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                                .show()
-                                            break
-                                        } else {
-                                            userList.add(currentUser)
-                                            mDbRef.child("user").child(mAuth.uid!!).child("friends")
-                                                .setValue(userList)
-                                            Toast.makeText(
-                                                this@MainActivity,
-                                                "Friend " + currentUser.name + " added to your friend list successfully",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                                .show()
-                                            adapter.notifyDataSetChanged()
-                                        }
-
+            if (checkInput(email)) {
+                mDbRef.child("user")
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            var exist = false
+                            for (ps in snapshot.children) {
+                                val currentUser = ps.getValue(User::class.java)
+                                if (currentUser?.email == email) {
+                                    exist = true
+                                    if (friendExists(currentUser.uid!!)) {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            "Friend " + currentUser.name + " is already in your friend list",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                            .show()
+                                        break
+                                    } else {
+                                        userList.add(currentUser)
+                                        mDbRef.child("user").child(mAuth.uid!!).child("friends")
+                                            .setValue(userList)
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            "Friend " + currentUser.name + " added to your friend list successfully",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                            .show()
+                                        adapter.notifyDataSetChanged()
                                     }
 
                                 }
-                                if (!exist) {
-                                    Toast.makeText(
-                                        this@MainActivity,
-                                        "No user found with this email",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                        .show()
-                                }
 
                             }
-
-                            override fun onCancelled(error: DatabaseError) {
+                            if (!exist) {
                                 Toast.makeText(
                                     this@MainActivity,
-                                    "Database Error",
+                                    "No user found with this email",
                                     Toast.LENGTH_SHORT
                                 )
                                     .show()
                             }
 
-                        })
+                        }
 
-                }
+                        override fun onCancelled(error: DatabaseError) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Database Error",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        }
+
+                    })
             }
+        }
+
+        btnRemove.setOnClickListener {
+
         }
 
 
@@ -139,6 +129,28 @@ class MainActivity : AppCompatActivity() {
 
 
         return true
+    }
+
+    private fun checkInput(input: String): Boolean {
+        var valid = false
+        when (input) {
+            "" -> {
+                Toast.makeText(this@MainActivity, "Please enter user email", Toast.LENGTH_SHORT)
+                    .show()
+            }
+            mAuth.currentUser?.email -> {
+                Toast.makeText(
+                    this@MainActivity,
+                    "You can't add yourself as a friend",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+            }
+            else -> {
+                valid =  true
+            }
+        }
+        return valid
     }
 
     private fun removeAllFriends() {
