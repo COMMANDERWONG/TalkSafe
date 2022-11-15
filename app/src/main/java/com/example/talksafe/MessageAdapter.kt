@@ -31,7 +31,21 @@ class MessageAdapter(val context: Context, val messageList: ArrayList<Message>) 
         if (holder.javaClass == SentViewHolder::class.java) {
             // sent view holder
             val viewHolder = holder as SentViewHolder
-            holder.sentMessage.text = currentMessage.message
+
+            if (currentMessage.timed == true)
+            {
+                val builder = StringBuilder()
+                builder.append("[")
+                    .append(currentMessage.timeLimit)
+                    .append("s] ")
+                    .append(currentMessage.message)
+
+                holder.sentMessage.text = builder.toString()
+            }
+            else
+            {
+                holder.sentMessage.text = currentMessage.message
+            }
         } else {
             val viewHolder = holder as ReceivedViewHolder
             holder.receivedMessage.text = currentMessage.message

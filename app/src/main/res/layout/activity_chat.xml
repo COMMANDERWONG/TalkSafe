@@ -11,7 +11,8 @@
         android:id="@+id/chat_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp" />
 
     <LinearLayout
         android:id="@+id/l_layout"
@@ -22,11 +23,19 @@
         android:weightSum="100">
 
         <EditText
-            android:id="@+id/msg_box"
-            android:layout_width="wrap_content"
+            android:id="@+id/msg_timer"
+            android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_weight="100"
             android:layout_marginLeft="10dp"
+            android:layout_weight="100"
+            android:hint="Timer" />
+
+        <EditText
+            android:id="@+id/msg_box"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="100"
             android:hint="Type a message here" />
 
         <ImageView
