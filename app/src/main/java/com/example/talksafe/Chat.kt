@@ -72,7 +72,7 @@ class Chat : AppCompatActivity() {
         sendBtn.setOnClickListener {
 
             val message = msgBox.text.toString()
-            val messageObj = Message(message, senderUID)
+            val messageObj = Message(message, senderUID,false)
 
             mDbRef.child("chat").child(senderRoom!!).child("messages").push()
                 .setValue(messageObj).addOnSuccessListener {
