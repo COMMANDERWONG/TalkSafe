@@ -101,13 +101,13 @@ class Chat : AppCompatActivity() {
 
                 if (messageObj.timed == true)
                 {
-                    //val tempTimer = messageObj.timeLimit
-                    //val msTimer: Long = tempTimer?.times(1000) as Long
-                    object : CountDownTimer(30000, 1000)
+                    val temp: Long = messageObj.timeLimit as Long
+                    object : CountDownTimer(temp, 1000)
                     {
                         override fun onTick(millisUntilFinished: Long)
                         {
-
+                            //messageObj.timeLimit?.minus(1)
+                            //mDbRef.child("chat").child(senderRoom!!).child("messages").child(mAuth.currentUser?.uid!!).child("timeLimit").setValue(messageObj.timeLimit)
                         }
 
                         override fun onFinish()
