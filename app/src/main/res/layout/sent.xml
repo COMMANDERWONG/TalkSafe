@@ -2,22 +2,23 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        >
+        android:layout_alignParentRight="true">
 
         <TextView
             android:id="@+id/t_sent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="This is a sent message"
-            android:textSize="20sp"
-            android:textColor="@color/black"
+            android:layout_marginRight="50dp"
             android:padding="10dp"
-            android:layout_marginRight="80dp"
-            />
+            android:text="This is a sent message"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
 
     </RelativeLayout>
+
+
 </RelativeLayout>
