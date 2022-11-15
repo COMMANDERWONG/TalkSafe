@@ -38,71 +38,19 @@ class MainActivity : AppCompatActivity() {
         userView.adapter = adapter
         userList.clear()
         getFriends()
+
         btnSearch.setOnClickListener {
             val email = tEmail.text.toString()
-            if (checkInput(email)) {
-                mDbRef.child("user")
-                    .addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            var exist = false
-                            for (ps in snapshot.children) {
-                                val currentUser = ps.getValue(User::class.java)
-                                if (currentUser?.email == email) {
-                                    exist = true
-                                    if (friendExists(currentUser.uid!!)) {
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            "Friend " + currentUser.name + " is already in your friend list",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                        break
-                                    } else {
-                                        userList.add(currentUser)
-                                        mDbRef.child("user").child(mAuth.uid!!).child("friends")
-                                            .setValue(userList)
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            "Friend " + currentUser.name + " added to your friend list successfully",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                        adapter.notifyDataSetChanged()
-                                    }
-
-                                }
-
-                            }
-                            if (!exist) {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    "No user found with this email",
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-                            }
-
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                "Database Error",
-                                Toast.LENGTH_SHORT
-                            )
-                                .show()
-                        }
-
-                    })
-            }
+            checkAddFriend(email)
         }
 
         btnRemove.setOnClickListener {
-
+            val email = tEmail.text.toString()
+            checkRemoveFriend(email)
         }
 
-
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
@@ -131,6 +79,85 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    private fun checkRemoveFriend(email: String) {
+        if (friendExists(email)) {
+            for (ps in userList) {
+                if (ps.email == email) {
+                    userList.remove(ps)
+                    mDbRef.child("user").child(mAuth.uid!!).child("friends").setValue(userList)
+                }
+            }
+            adapter.notifyDataSetChanged()
+
+        } else {
+            Toast.makeText(
+                this@MainActivity,
+                "This user is not in your friend list",
+                Toast.LENGTH_SHORT
+            )
+                .show()
+        }
+    }
+
+    private fun checkAddFriend(email: String) {
+        var exist = true
+        if (checkInput(email)) {
+            mDbRef.child("user")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        exist = false
+                        for (ps in snapshot.children) {
+                            val chkUser = ps.getValue(User::class.java)
+                            if (chkUser?.email == email) {
+                                exist = true
+
+                                if (friendExists(chkUser.email)) {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        "Friend " + chkUser.name + " is already in your friend list",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
+                                } else {
+                                    userList.add(chkUser)
+                                    mDbRef.child("user").child(mAuth.uid!!).child("friends")
+                                        .setValue(userList)
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        "Friend " + chkUser.name + " added to your friend list successfully",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
+                                    adapter.notifyDataSetChanged()
+                                }
+
+                            }
+
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Database Error",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                })
+        }
+
+        if (!exist) {
+            Toast.makeText(
+                this@MainActivity,
+                "No user found with this email",
+                Toast.LENGTH_SHORT
+            )
+                .show()
+        }
+
+    }
+
     private fun checkInput(input: String): Boolean {
         var valid = false
         when (input) {
@@ -147,7 +174,7 @@ class MainActivity : AppCompatActivity() {
                     .show()
             }
             else -> {
-                valid =  true
+                valid = true
             }
         }
         return valid
@@ -164,8 +191,8 @@ class MainActivity : AppCompatActivity() {
                 ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     for (ps in snapshot.children) {
-                        val currentUser = ps.getValue(User::class.java)
-                        userList.add(currentUser!!)
+                        val chkUser = ps.getValue(User::class.java)
+                        userList.add(chkUser!!)
                     }
                     adapter.notifyDataSetChanged()
                 }
@@ -175,11 +202,11 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
-    private fun friendExists(uid: String): Boolean {
+    private fun friendExists(email: String?): Boolean {
         var exist = false
 
         for (ps in userList) {
-            if (ps.uid == uid) {
+            if (ps.email == email) {
                 exist = true
                 break
             }
