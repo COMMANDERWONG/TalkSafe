@@ -12,7 +12,10 @@
         android:id="@+id/big_timer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:text="Message: None Time: None"
+        android:textAlignment="center"
+        android:textSize="30sp" />
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -20,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="0dp" />
+        android:layout_marginTop="40dp"  />
 
     <LinearLayout
         android:id="@+id/l_layout"

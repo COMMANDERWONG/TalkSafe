@@ -2,8 +2,6 @@ package com.example.talksafe
 
 import android.Manifest
 import android.content.Intent
-import android.content.IntentSender.OnFinished
-import androidx.appcompat.app.AppCompatActivity
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -31,6 +30,7 @@ import java.time.format.DateTimeFormatter
 
 class Chat : AppCompatActivity() {
     private lateinit var chatView: RecyclerView
+    private lateinit var bigTimerView: TextView
     private lateinit var msgBox: EditText
     private lateinit var msgTimer: EditText
     private lateinit var sendBtn: ImageView
@@ -65,6 +65,7 @@ class Chat : AppCompatActivity() {
         supportActionBar?.title = rName
 
         chatView = findViewById(R.id.chat_view)
+        bigTimerView = findViewById(R.id.big_timer)
         msgBox = findViewById(R.id.msg_box)
         msgTimer = findViewById(R.id.msg_timer)
         sendBtn = findViewById(R.id.send_btn)
@@ -87,16 +88,25 @@ class Chat : AppCompatActivity() {
                         msgList.add(message!!)
 
                         if (message.timed == true) {
-                            var temp = message.timeLimit!!.toLong().times(1000)
+                            val temp = message.timeLimit!!.toLong().times(1000)
+                            var msgCountDown = message.timeLimit!!.toInt()
                             isTimeLimitSet = true
                             object : CountDownTimer(temp, 1000) {
                                 override fun onTick(millisUntilFinished: Long) {
-                                    //message.timeLimit = message.timeLimit!! - 1
-                                    //println(message.timeLimit)
-                                    //mDbRef.child("chat").child(senderRoom!!).child("messages").child(msgKey!!).child("timeLimit:").setValue(message.timeLimit)
+                                    val builder = StringBuilder()
+                                    builder.append("Message: ")
+                                        .append(message.message)
+                                        .append(", Time: ")
+                                        .append(msgCountDown)
+
+                                    bigTimerView.setText(builder)
+
+                                    msgCountDown -= 1
                                 }
 
                                 override fun onFinish() {
+                                    bigTimerView.setText("Message: None, Time: None")
+
                                     mDbRef.child("chat").child(senderRoom!!).child("messages")
                                         .child(msgKey!!).removeValue()
 
@@ -109,7 +119,6 @@ class Chat : AppCompatActivity() {
 
                                                     if (msgRec!!.timed == true && msgRec.message.equals(message.message) && msgRec.senderID.equals(message.senderID))
                                                     {
-                                                        println("message deleted!")
                                                         mDbRef.child("chat").child(receiverRoom!!).child("messages").child(msgRecKey!!).removeValue()
                                                         isTimeLimitSet = false
                                                     }
@@ -136,11 +145,32 @@ class Chat : AppCompatActivity() {
         // adding message to database
         sendBtn.setOnClickListener {
             val message = msgBox.text.toString()
-            val messageObj = Message(message, SID, false)
+            val timer = msgTimer.text.toString()
+
             if (message.isNotEmpty()) {
-                val timer = msgTimer.text.toString()
-                if (timer.isEmpty() || (timer.isNotEmpty() && !isTimeLimitSet && timer.isDigitsOnly() && timer.toInt() >= 0 && timer.toInt() <= 600)) {
-                    val messageObj = Message(message, senderUID, false)
+                if (isTimeLimitSet) {
+                    Toast.makeText(
+                        this@Chat,
+                        "Only one time-limited message can be sent before its removal!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (!timer.isDigitsOnly()) {
+                    Toast.makeText(
+                        this@Chat,
+                        "Only accept integer input!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    msgTimer.setText("")
+                } else if (timer.isNotEmpty() && (timer.toInt() < 1 || timer.toInt() > 600)) {
+                    Toast.makeText(
+                        this@Chat,
+                        "Input out of range! (1 - 600)",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    msgTimer.setText("")
+                }
+                else {
+                    val messageObj = Message(message, SID, false)
 
                     if (timer.isNotEmpty()) {
                         messageObj.timed = true
@@ -154,22 +184,6 @@ class Chat : AppCompatActivity() {
                         }
                     msgBox.setText("")
                     msgTimer.setText("")
-                } else {
-                    if (isTimeLimitSet) {
-                        Toast.makeText(
-                            this@Chat,
-                            "Only one time-limited message can be sent before its removal!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    else {
-                        Toast.makeText(
-                            this@Chat,
-                            "The timer accepts integer (0 - 600) input only!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        msgTimer.setText("")
-                    }
                 }
             } else {
                 Toast.makeText(
