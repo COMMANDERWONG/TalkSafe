@@ -97,15 +97,15 @@ class Chat : AppCompatActivity() {
                     msgTimer.setText("")
 
                     if (messageObj.timed == true) {
-                        //val temp: Long = messageObj.timeLimit as Long
-                        object : CountDownTimer(30000, 1000) {
+                        var temp = messageObj.timeLimit!!.toLong()
+                        object : CountDownTimer(temp, 1000) {
                             override fun onTick(millisUntilFinished: Long) {
-                                //messageObj.timeLimit?.minus(1)
-                                //mDbRef.child("chat").child(senderRoom!!).child("messages").child(mAuth.currentUser?.uid!!).child("timeLimit").setValue(messageObj.timeLimit)
+                                //temp = temp.minus(1)
+                                //println(temp)
                             }
 
                             override fun onFinish() {
-
+                                //mDbRef.child("chat").child(senderRoom!!).child("messages").
                             }
                         }.start()
                     }
