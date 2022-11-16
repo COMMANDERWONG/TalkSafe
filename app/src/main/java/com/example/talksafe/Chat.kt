@@ -84,19 +84,19 @@ class Chat : AppCompatActivity() {
 
                     msgList.clear()
                     for (ps in snapshot.children) {
-                        val message = ps.getValue(Message::class.java)
+                        val msg = ps.getValue(Message::class.java)
                         val msgKey = ps.key
-                        msgList.add(message!!)
+                        msgList.add(msg!!)
 
-                        if (message.timed == true && msgCountDown == 0) {
-                            val temp = message.timeLimit!!.toLong().times(1000)
-                            msgCountDown = message.timeLimit!!.toInt()
+                        if (msg.timed == true && msgCountDown == 0) {
+                            val temp = msg.timeLimit!!.toLong().times(1000)
+                            msgCountDown = msg.timeLimit!!.toInt()
                             isTimeLimitSet = true
                             object : CountDownTimer(temp, 1000) {
                                 override fun onTick(millisUntilFinished: Long) {
                                     val builder = StringBuilder()
                                     builder.append("Message: ")
-                                        .append(message.message)
+                                        .append(msg.message)
                                         .append(", Time: ")
                                         .append(msgCountDown)
 
@@ -119,7 +119,7 @@ class Chat : AppCompatActivity() {
                                                     val msgRec = ps2.getValue(Message::class.java)
                                                     val msgRecKey = ps2.key
 
-                                                    if (msgRec!!.timed == true && msgRec.message.equals(message.message) && msgRec.senderID.equals(message.senderID))
+                                                    if (msgRec!!.timed == true && msgRec.message.equals(msg.message) && msgRec.senderID.equals(msg.senderID))
                                                     {
                                                         mDbRef.child("chat").child(receiverRoom!!).child("messages").child(msgRecKey!!).removeValue()
                                                         isTimeLimitSet = false
