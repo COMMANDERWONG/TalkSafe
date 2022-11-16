@@ -81,7 +81,7 @@ class Chat : AppCompatActivity() {
             val message = msgBox.text.toString()
 
             val timer = msgTimer.text.toString()
-            if (timer.isDigitsOnly() || timer.toInt() >= 0 || timer.toInt() <= 600)
+            if (timer.isDigitsOnly() && timer.toInt() >= 0 && timer.toInt() <= 600)
             {
                 val messageObj = Message(message, senderUID,false)
 
@@ -99,10 +99,10 @@ class Chat : AppCompatActivity() {
                 msgBox.setText("")
                 msgTimer.setText("")
 
-                if (messageObj.timed == true)
+               if (messageObj.timed == true)
                 {
-                    val temp: Long = messageObj.timeLimit as Long
-                    object : CountDownTimer(temp, 1000)
+                    //val temp: Long = messageObj.timeLimit as Long
+                    object : CountDownTimer(30000, 1000)
                     {
                         override fun onTick(millisUntilFinished: Long)
                         {
