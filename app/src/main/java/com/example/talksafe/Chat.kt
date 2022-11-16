@@ -65,6 +65,20 @@ class Chat : AppCompatActivity() {
                     for (ps in snapshot.children) {
                         val message = ps.getValue(Message::class.java)
                         msgList.add(message!!)
+
+                        if (message.timed == true) {
+                            var temp = message.timeLimit!!.toLong().times(1000)
+                            object : CountDownTimer(temp, 1000) {
+                                override fun onTick(millisUntilFinished: Long) {
+                                    message.timeLimit = message.timeLimit!! - 1
+                                    println(message.timeLimit)
+                                }
+
+                                override fun onFinish() {
+                                   println(mDbRef.child("chat").child(senderRoom!!).child("messages").get().toString())
+                                }
+                            }.start()
+                        }
                     }
                     msgAdapter.notifyDataSetChanged()
                 }
@@ -95,20 +109,6 @@ class Chat : AppCompatActivity() {
                         }
                     msgBox.setText("")
                     msgTimer.setText("")
-
-                    if (messageObj.timed == true) {
-                        var temp = messageObj.timeLimit!!.toLong()
-                        object : CountDownTimer(temp, 1000) {
-                            override fun onTick(millisUntilFinished: Long) {
-                                //temp = temp.minus(1)
-                                //println(temp)
-                            }
-
-                            override fun onFinish() {
-                                //mDbRef.child("chat").child(senderRoom!!).child("messages").
-                            }
-                        }.start()
-                    }
                 } else {
                     Toast.makeText(
                         this@Chat,
