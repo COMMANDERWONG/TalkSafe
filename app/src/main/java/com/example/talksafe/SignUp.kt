@@ -52,7 +52,7 @@ class SignUp : AppCompatActivity() {
                     } else if (password.length < 6) {
                         Toast.makeText(
                             this@SignUp,
-                            "Password must be at least 6 digits",
+                            "Password must consists at least 6 characters",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -60,7 +60,7 @@ class SignUp : AppCompatActivity() {
         } else {
             Toast.makeText(
                 this@SignUp,
-                "Please fill in all fields!",
+                "Please fill in all fields",
                 Toast.LENGTH_SHORT
             ).show()
         }

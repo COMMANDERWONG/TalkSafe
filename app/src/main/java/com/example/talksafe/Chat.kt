@@ -76,16 +76,14 @@ class Chat : AppCompatActivity() {
 
         chatView.layoutManager = LinearLayoutManager(this)
         chatView.adapter = msgAdapter
-
         // get messages from database
         mDbRef.child("chat").child(senderRoom!!).child("messages")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-
                     msgList.clear()
                     for (ps in snapshot.children) {
                         val msg = ps.getValue(Message::class.java)
-                        val msgKey = ps.key
+                        val msgID = ps.key.toString()
                         msgList.add(msg!!)
 
                         if (msg.timed == true && msgCountDown == 0) {
@@ -100,37 +98,17 @@ class Chat : AppCompatActivity() {
                                         .append(", Time: ")
                                         .append(msgCountDown)
 
-                                    bigTimerView.setText(builder)
-
+                                    bigTimerView.text = builder
                                     msgCountDown -= 1
                                 }
 
                                 override fun onFinish() {
                                     msgCountDown = 0
-                                    bigTimerView.setText("Message: None, Time: None")
+                                    bigTimerView.text = "Message: None, Time: None"
 
                                     mDbRef.child("chat").child(senderRoom!!).child("messages")
-                                        .child(msgKey!!).removeValue()
+                                        .child(msgID).removeValue()
 
-                                    mDbRef.child("chat").child(receiverRoom!!).child("messages")
-                                        .addValueEventListener(object : ValueEventListener {
-                                            override fun onDataChange(snapshot2: DataSnapshot) {
-                                                for (ps2 in snapshot2.children) {
-                                                    val msgRec = ps2.getValue(Message::class.java)
-                                                    val msgRecKey = ps2.key
-
-                                                    if (msgRec!!.timed == true && msgRec.message.equals(msg.message) && msgRec.senderID.equals(msg.senderID))
-                                                    {
-                                                        mDbRef.child("chat").child(receiverRoom!!).child("messages").child(msgRecKey!!).removeValue()
-                                                        isTimeLimitSet = false
-                                                    }
-                                                }
-                                            }
-
-                                            override fun onCancelled(error: DatabaseError) {
-
-                                            }
-                                        })
                                     isTimeLimitSet = false
                                 }
                             }.start()
@@ -139,8 +117,8 @@ class Chat : AppCompatActivity() {
                     msgAdapter.notifyDataSetChanged()
                 }
 
-                override fun onCancelled(error: DatabaseError) {
 
+                override fun onCancelled(error: DatabaseError) {
 
                 }
             })
@@ -154,26 +132,25 @@ class Chat : AppCompatActivity() {
                 if (isTimeLimitSet && timer.isNotEmpty()) {
                     Toast.makeText(
                         this@Chat,
-                        "Only one time-limited message can be sent before its removal!",
+                        "Only one time-limited message can be active",
                         Toast.LENGTH_SHORT
                     ).show()
                     msgTimer.setText("")
                 } else if (!timer.isDigitsOnly()) {
                     Toast.makeText(
                         this@Chat,
-                        "Only accept integer input!",
+                        "Only accept integer input",
                         Toast.LENGTH_SHORT
                     ).show()
                     msgTimer.setText("")
-                } else if (timer.isNotEmpty() && (timer.toInt() < 1 || timer.toInt() > 600)) {
+                } else if (timer.isNotEmpty() && (timer.toInt() < 10 || timer.toInt() > 60)) {
                     Toast.makeText(
                         this@Chat,
-                        "Input out of range! (1 - 600)",
+                        "Input out of range! (10 - 60)",
                         Toast.LENGTH_SHORT
                     ).show()
                     msgTimer.setText("")
-                }
-                else {
+                } else {
                     val messageObj = Message(message, SID, false)
 
                     if (timer.isNotEmpty()) {
@@ -192,7 +169,7 @@ class Chat : AppCompatActivity() {
             } else {
                 Toast.makeText(
                     this@Chat,
-                    "Please type a message before sending it!",
+                    "Please type a message before sending it",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -223,6 +200,7 @@ class Chat : AppCompatActivity() {
                 saveTextFile()
             }
             R.id.logout -> {
+
                 mAuth.signOut()
                 val intent = Intent(this@Chat, LogIn::class.java)
                 finish()
@@ -251,8 +229,6 @@ class Chat : AppCompatActivity() {
         mDbRef.child("chat").child(receiverRoom!!).child("messages").get().addOnSuccessListener {
             if (it.exists()) {
                 for (ps in it.children) {
-
-                    //receiverUID   senderUID senderID
 
                     if ((ps.child("senderID").value).toString() == SID) {
                         meg = "You: "
@@ -292,15 +268,22 @@ class Chat : AppCompatActivity() {
                         }
                         Toast.makeText(
                             this@Chat,
-                            "Information saved to SD card.",
+                            "Information saved to SD card",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
+            } else {
+                Toast.makeText(
+                    this@Chat,
+                    "There's no chat to be exported",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
     }
+
 
     private fun isStoragePermissionGranted(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -30,22 +30,13 @@ class MessageAdapter(val context: Context, val messageList: ArrayList<Message>) 
         val currentMessage = messageList[position]
         if (holder.javaClass == SentViewHolder::class.java) {
             // sent view holder
-            val viewHolder = holder as SentViewHolder
+            holder as SentViewHolder
+            buildMessage(currentMessage)
+            holder.sentMessage.text = buildMessage(currentMessage)
 
-            if (currentMessage.timed == true) {
-                val builder = StringBuilder()
-                builder.append("[")
-                    .append(currentMessage.timeLimit)
-                    .append("s] ")
-                    .append(currentMessage.message)
-
-                holder.sentMessage.text = builder.toString()
-            } else {
-                holder.sentMessage.text = currentMessage.message
-            }
         } else {
-            val viewHolder = holder as ReceivedViewHolder
-            holder.receivedMessage.text = currentMessage.message
+            holder as ReceivedViewHolder
+            holder.receivedMessage.text = buildMessage(currentMessage)
         }
     }
 
@@ -59,6 +50,19 @@ class MessageAdapter(val context: Context, val messageList: ArrayList<Message>) 
     }
     override fun getItemCount(): Int {
     return messageList.size
+    }
+
+    private fun buildMessage(msg:Message):String{
+        if (msg.timed == true) {
+            val builder = StringBuilder()
+            builder.append("[")
+                .append(msg.timeLimit)
+                .append("s] ")
+                .append(msg.message)
+            return builder.toString()
+        } else {
+            return msg.message!!
+        }
     }
 
     class SentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

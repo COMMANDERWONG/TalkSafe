@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/removeChat"
-        android:title="Remove Chat" />
+    <item android:id="@+id/removeChat" android:title="Remove Chat" />
     <item android:id="@+id/exportChat" android:title="Export Chat"/>
     <item android:id="@+id/logout" android:title="Log out"/>
 </menu>
