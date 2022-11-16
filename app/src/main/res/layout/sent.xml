@@ -13,11 +13,12 @@
             android:id="@+id/t_sent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/chat_inputmessage"
             android:text="This is a sent message"
             android:textSize="20sp"
-            android:textColor="@color/black"
+            android:textColor="#AB78DF"
             android:padding="10dp"
-            android:layout_marginRight="80dp"
+            android:layout_marginRight="0dp"
             />
 
     </RelativeLayout>
