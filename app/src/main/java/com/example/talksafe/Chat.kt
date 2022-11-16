@@ -42,6 +42,7 @@ class Chat : AppCompatActivity() {
     var receiverRoom: String? = null
     var senderRoom: String? = null
     var isTimeLimitSet: Boolean = false
+    var msgCountDown: Int = 0
 
     var rName: String? = null
     var SID: String? = null
@@ -87,9 +88,9 @@ class Chat : AppCompatActivity() {
                         val msgKey = ps.key
                         msgList.add(message!!)
 
-                        if (message.timed == true) {
+                        if (message.timed == true && msgCountDown == 0) {
                             val temp = message.timeLimit!!.toLong().times(1000)
-                            var msgCountDown = message.timeLimit!!.toInt()
+                            msgCountDown = message.timeLimit!!.toInt()
                             isTimeLimitSet = true
                             object : CountDownTimer(temp, 1000) {
                                 override fun onTick(millisUntilFinished: Long) {
@@ -105,6 +106,7 @@ class Chat : AppCompatActivity() {
                                 }
 
                                 override fun onFinish() {
+                                    msgCountDown = 0
                                     bigTimerView.setText("Message: None, Time: None")
 
                                     mDbRef.child("chat").child(senderRoom!!).child("messages")
@@ -129,6 +131,7 @@ class Chat : AppCompatActivity() {
 
                                             }
                                         })
+                                    isTimeLimitSet = false
                                 }
                             }.start()
                         }
@@ -148,12 +151,13 @@ class Chat : AppCompatActivity() {
             val timer = msgTimer.text.toString()
 
             if (message.isNotEmpty()) {
-                if (isTimeLimitSet) {
+                if (isTimeLimitSet && timer.isNotEmpty()) {
                     Toast.makeText(
                         this@Chat,
                         "Only one time-limited message can be sent before its removal!",
                         Toast.LENGTH_SHORT
                     ).show()
+                    msgTimer.setText("")
                 } else if (!timer.isDigitsOnly()) {
                     Toast.makeText(
                         this@Chat,
