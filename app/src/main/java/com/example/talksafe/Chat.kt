@@ -81,7 +81,7 @@ class Chat : AppCompatActivity() {
             val message = msgBox.text.toString()
 
             val timer = msgTimer.text.toString()
-            if (timer.isDigitsOnly() && timer.toInt() >= 0 && timer.toInt() <= 600)
+            if (timer.isDigitsOnly() && timer.isNotEmpty() && timer.toInt() >= 0 && timer.toInt() <= 600)
             {
                 val messageObj = Message(message, senderUID,false)
 
