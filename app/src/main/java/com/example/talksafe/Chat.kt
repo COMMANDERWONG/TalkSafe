@@ -77,54 +77,52 @@ class Chat : AppCompatActivity() {
 
         // adding message to database
         sendBtn.setOnClickListener {
-
             val message = msgBox.text.toString()
+            if (message.isNotEmpty()) {
+                val timer = msgTimer.text.toString()
+                if ((timer.isEmpty()) || (timer.isNotEmpty() && timer.isDigitsOnly() && timer.toInt() >= 0 && timer.toInt() <= 600)) {
+                    val messageObj = Message(message, senderUID, false)
 
-            val timer = msgTimer.text.toString()
-            if (timer.isDigitsOnly() && timer.isNotEmpty() && timer.toInt() >= 0 && timer.toInt() <= 600)
-            {
-                val messageObj = Message(message, senderUID,false)
-
-                if (timer.isNotEmpty())
-                {
-                    messageObj.timed = true
-                    messageObj.timeLimit = timer.toInt()
-                }
-
-                mDbRef.child("chat").child(senderRoom!!).child("messages").push()
-                    .setValue(messageObj).addOnSuccessListener {
-                        mDbRef.child("chat").child(receiverRoom!!).child("messages").push()
-                            .setValue(messageObj)
+                    if (timer.isNotEmpty()) {
+                        messageObj.timed = true
+                        messageObj.timeLimit = timer.toInt()
                     }
-                msgBox.setText("")
-                msgTimer.setText("")
 
-               if (messageObj.timed == true)
-                {
-                    //val temp: Long = messageObj.timeLimit as Long
-                    object : CountDownTimer(30000, 1000)
-                    {
-                        override fun onTick(millisUntilFinished: Long)
-                        {
-                            //messageObj.timeLimit?.minus(1)
-                            //mDbRef.child("chat").child(senderRoom!!).child("messages").child(mAuth.currentUser?.uid!!).child("timeLimit").setValue(messageObj.timeLimit)
+                    mDbRef.child("chat").child(senderRoom!!).child("messages").push()
+                        .setValue(messageObj).addOnSuccessListener {
+                            mDbRef.child("chat").child(receiverRoom!!).child("messages").push()
+                                .setValue(messageObj)
                         }
+                    msgBox.setText("")
+                    msgTimer.setText("")
 
-                        override fun onFinish()
-                        {
+                    if (messageObj.timed == true) {
+                        //val temp: Long = messageObj.timeLimit as Long
+                        object : CountDownTimer(30000, 1000) {
+                            override fun onTick(millisUntilFinished: Long) {
+                                //messageObj.timeLimit?.minus(1)
+                                //mDbRef.child("chat").child(senderRoom!!).child("messages").child(mAuth.currentUser?.uid!!).child("timeLimit").setValue(messageObj.timeLimit)
+                            }
 
-                        }
-                    }.start()
+                            override fun onFinish() {
+
+                            }
+                        }.start()
+                    }
+                } else {
+                    Toast.makeText(
+                        this@Chat,
+                        "The timer accepts integer (0 - 600) input only!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    msgTimer.setText("")
                 }
-            }
-            else
-            {
+            } else {
                 Toast.makeText(
                     this@Chat,
-                    "The timer accepts integer (0 - 600) input only!",
+                    "Please type a message before sending it!",
                     Toast.LENGTH_SHORT
                 ).show()
-                msgTimer.setText("")
             }
         }
     }
