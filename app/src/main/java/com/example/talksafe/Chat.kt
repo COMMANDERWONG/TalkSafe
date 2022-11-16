@@ -64,18 +64,23 @@ class Chat : AppCompatActivity() {
                     msgList.clear()
                     for (ps in snapshot.children) {
                         val message = ps.getValue(Message::class.java)
+                        val msgKey = ps.key
                         msgList.add(message!!)
 
                         if (message.timed == true) {
                             var temp = message.timeLimit!!.toLong().times(1000)
                             object : CountDownTimer(temp, 1000) {
                                 override fun onTick(millisUntilFinished: Long) {
-                                    message.timeLimit = message.timeLimit!! - 1
-                                    println(message.timeLimit)
+                                    //message.timeLimit = message.timeLimit!! - 1
                                 }
 
                                 override fun onFinish() {
-                                   println(mDbRef.child("chat").child(senderRoom!!).child("messages").get().toString())
+                                    mDbRef.child("chat").child(senderRoom!!).child("messages")
+                                        .child(msgKey!!).removeValue().addOnSuccessListener {
+                                            mDbRef.child("chat").child(receiverRoom!!)
+                                                .child("messages")
+                                                .child(msgKey!!).removeValue()
+                                        }
                                 }
                             }.start()
                         }
