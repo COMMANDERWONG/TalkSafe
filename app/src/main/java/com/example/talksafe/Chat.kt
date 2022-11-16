@@ -29,6 +29,7 @@ class Chat : AppCompatActivity() {
 
     var receiverRoom: String? = null
     var senderRoom: String? = null
+    var isTimeLimitSet: Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,14 +70,38 @@ class Chat : AppCompatActivity() {
 
                         if (message.timed == true) {
                             var temp = message.timeLimit!!.toLong().times(1000)
+                            isTimeLimitSet = true
                             object : CountDownTimer(temp, 1000) {
                                 override fun onTick(millisUntilFinished: Long) {
                                     //message.timeLimit = message.timeLimit!! - 1
+                                    //println(message.timeLimit)
+                                    //mDbRef.child("chat").child(senderRoom!!).child("messages").child(msgKey!!).child("timeLimit:").setValue(message.timeLimit)
                                 }
 
                                 override fun onFinish() {
                                     mDbRef.child("chat").child(senderRoom!!).child("messages")
                                         .child(msgKey!!).removeValue()
+
+                                    mDbRef.child("chat").child(receiverRoom!!).child("messages")
+                                        .addValueEventListener(object : ValueEventListener {
+                                            override fun onDataChange(snapshot2: DataSnapshot) {
+                                                for (ps2 in snapshot2.children) {
+                                                    val msgRec = ps2.getValue(Message::class.java)
+                                                    val msgRecKey = ps2.key
+
+                                                    if (msgRec!!.timed == true && msgRec.message.equals(message.message) && msgRec.senderID.equals(message.senderID))
+                                                    {
+                                                        println("message deleted!")
+                                                        mDbRef.child("chat").child(receiverRoom!!).child("messages").child(msgRecKey!!).removeValue()
+                                                        isTimeLimitSet = false
+                                                    }
+                                                }
+                                            }
+
+                                            override fun onCancelled(error: DatabaseError) {
+
+                                            }
+                                        })
                                 }
                             }.start()
                         }
@@ -95,7 +120,7 @@ class Chat : AppCompatActivity() {
             val message = msgBox.text.toString()
             if (message.isNotEmpty()) {
                 val timer = msgTimer.text.toString()
-                if ((timer.isEmpty()) || (timer.isNotEmpty() && timer.isDigitsOnly() && timer.toInt() >= 0 && timer.toInt() <= 600)) {
+                if (timer.isEmpty() || (timer.isNotEmpty() && !isTimeLimitSet && timer.isDigitsOnly() && timer.toInt() >= 0 && timer.toInt() <= 600)) {
                     val messageObj = Message(message, senderUID, false)
 
                     if (timer.isNotEmpty()) {
@@ -111,12 +136,21 @@ class Chat : AppCompatActivity() {
                     msgBox.setText("")
                     msgTimer.setText("")
                 } else {
-                    Toast.makeText(
-                        this@Chat,
-                        "The timer accepts integer (0 - 600) input only!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    msgTimer.setText("")
+                    if (isTimeLimitSet) {
+                        Toast.makeText(
+                            this@Chat,
+                            "Only one time-limited message can be sent before its removal!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    else {
+                        Toast.makeText(
+                            this@Chat,
+                            "The timer accepts integer (0 - 600) input only!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        msgTimer.setText("")
+                    }
                 }
             } else {
                 Toast.makeText(

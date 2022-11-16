@@ -7,6 +7,13 @@
     tools:context=".Chat">
 
 
+    <TextView
+        android:id="@+id/big_timer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_view"
         android:layout_width="match_parent"
