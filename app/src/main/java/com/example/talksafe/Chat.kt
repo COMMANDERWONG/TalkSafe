@@ -33,11 +33,11 @@ class Chat : AppCompatActivity() {
     private lateinit var msgList: ArrayList<Message>
     private lateinit var mDbRef: DatabaseReference
     private lateinit var mAuth: FirebaseAuth
-    private lateinit var sName: String
 
     var receiverRoom: String? = null
     var senderRoom: String? = null
 
+    var rName: String? = null
     var SID: String? = null
     var RID: String? = null
 
@@ -46,20 +46,17 @@ class Chat : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-        val name = intent.getStringExtra("name")
-        val receiverUID = intent.getStringExtra("uid")
+        rName = intent.getStringExtra("name")
+        RID = intent.getStringExtra("uid")
 
-        val senderUID = FirebaseAuth.getInstance().currentUser?.uid
+        SID = FirebaseAuth.getInstance().currentUser?.uid
 
-        SID = senderUID.toString()
-        RID = receiverUID.toString()
-        sName = name.toString()
 
         mDbRef = FirebaseDatabase.getInstance().getReference()
 
-        senderRoom = receiverUID + senderUID
-        receiverRoom = senderUID + receiverUID
-        supportActionBar?.title = name
+        senderRoom = RID + SID
+        receiverRoom = SID + RID
+        supportActionBar?.title = rName
 
         chatView = findViewById(R.id.chat_view)
         msgBox = findViewById(R.id.msg_box)
@@ -92,7 +89,7 @@ class Chat : AppCompatActivity() {
         sendBtn.setOnClickListener {
 
             val message = msgBox.text.toString()
-            val messageObj = Message(message, senderUID, false)
+            val messageObj = Message(message, SID, false)
 
             mDbRef.child("chat").child(senderRoom!!).child("messages").push()
                 .setValue(messageObj).addOnSuccessListener {
@@ -159,12 +156,13 @@ class Chat : AppCompatActivity() {
                     //receiverUID   senderUID senderID
 
                     if ((ps.child("senderID").value).toString() == SID) {
-                        meg = sName
-                        meg += " : "
+                        meg = "You: "
                         meg += (ps.child("message").value).toString()
                         list.add(meg)
+
                     } else {
-                        meg = "You : "
+                        meg = rName.toString()
+                        meg += ": "
                         meg += (ps.child("message").value).toString()
                         list.add(meg)
                     }
@@ -176,9 +174,9 @@ class Chat : AppCompatActivity() {
                     postfix = "",
                 )
                 if (isStoragePermissionGranted()) {
-                    if (!fileContent.equals("")) {
+                    if (fileContent != "") {
                         val myExternalFile = File(getExternalFilesDir(filepath), filename)
-                        var fos: FileOutputStream?
+                        val fos: FileOutputStream?
                         try {
                             // Instantiate the FileOutputStream object and pass myExternalFile in constructor
                             fos = FileOutputStream(myExternalFile)
