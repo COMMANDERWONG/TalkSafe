@@ -3,5 +3,6 @@
     <item
         android:id="@+id/removeChat"
         android:title="Remove Chat" />
+    <item android:id="@+id/exportChat" android:title="Export Chat"/>
     <item android:id="@+id/logout" android:title="Log out"/>
 </menu>

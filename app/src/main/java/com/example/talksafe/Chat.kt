@@ -1,17 +1,28 @@
 package com.example.talksafe
 
+import android.Manifest
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 class Chat : AppCompatActivity() {
@@ -22,9 +33,13 @@ class Chat : AppCompatActivity() {
     private lateinit var msgList: ArrayList<Message>
     private lateinit var mDbRef: DatabaseReference
     private lateinit var mAuth: FirebaseAuth
+    private lateinit var sName: String
 
     var receiverRoom: String? = null
     var senderRoom: String? = null
+
+    var SID: String? = null
+    var RID: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +50,11 @@ class Chat : AppCompatActivity() {
         val receiverUID = intent.getStringExtra("uid")
 
         val senderUID = FirebaseAuth.getInstance().currentUser?.uid
+
+        SID = senderUID.toString()
+        RID = receiverUID.toString()
+        sName = name.toString()
+
         mDbRef = FirebaseDatabase.getInstance().getReference()
 
         senderRoom = receiverUID + senderUID
@@ -72,7 +92,7 @@ class Chat : AppCompatActivity() {
         sendBtn.setOnClickListener {
 
             val message = msgBox.text.toString()
-            val messageObj = Message(message, senderUID,false)
+            val messageObj = Message(message, senderUID, false)
 
             mDbRef.child("chat").child(senderRoom!!).child("messages").push()
                 .setValue(messageObj).addOnSuccessListener {
@@ -88,6 +108,7 @@ class Chat : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.removeChat -> {
@@ -102,6 +123,9 @@ class Chat : AppCompatActivity() {
                 finish()
                 startActivity(intent)
             }
+            R.id.exportChat -> {
+                saveTextFile()
+            }
             R.id.logout -> {
                 mAuth.signOut()
                 val intent = Intent(this@Chat, LogIn::class.java)
@@ -114,5 +138,95 @@ class Chat : AppCompatActivity() {
         return true
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun saveTextFile() {
+
+        val current = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val formatted = current.format(formatter)
+        val filename = "$formatted.txt"
+        val filepath = "TalkSafe/messages"
+
+
+        val list = ArrayList<String>()
+
+        var meg: String
+        var fileContent = ""
+        mDbRef.child("chat").child(receiverRoom!!).child("messages").get().addOnSuccessListener {
+            if (it.exists()) {
+                for (ps in it.children) {
+
+                    //receiverUID   senderUID senderID
+
+                    if ((ps.child("senderID").value).toString() == SID) {
+                        meg = sName
+                        meg += " : "
+                        meg += (ps.child("message").value).toString()
+                        list.add(meg)
+                    } else {
+                        meg = "You : "
+                        meg += (ps.child("message").value).toString()
+                        list.add(meg)
+                    }
+                }
+
+                fileContent += list.joinToString(
+                    prefix = "",
+                    separator = "\r\n",
+                    postfix = "",
+                )
+                if (isStoragePermissionGranted()) {
+                    if (!fileContent.equals("")) {
+                        val myExternalFile = File(getExternalFilesDir(filepath), filename)
+                        var fos: FileOutputStream?
+                        try {
+                            // Instantiate the FileOutputStream object and pass myExternalFile in constructor
+                            fos = FileOutputStream(myExternalFile)
+                            // Write to the file
+
+                            fos.write(fileContent.toByteArray())
+
+                            // Close the stream
+                            fos.close()
+                        } catch (e: FileNotFoundException) {
+                            e.printStackTrace()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                        Toast.makeText(
+                            this@Chat,
+                            "Information saved to SD card.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
+
+    }
+
+    private fun isStoragePermissionGranted(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                //Permission is granted
+                true
+            } else {
+                //Permission is revoked
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    1
+                )
+                false
+            }
+        } else {
+            //permission is automatically granted on sdk<23 upon installation
+            //Permission is granted
+            true
+        }
+    }
 
 }
+
