@@ -76,11 +76,7 @@ class Chat : AppCompatActivity() {
 
                                 override fun onFinish() {
                                     mDbRef.child("chat").child(senderRoom!!).child("messages")
-                                        .child(msgKey!!).removeValue().addOnSuccessListener {
-                                            mDbRef.child("chat").child(receiverRoom!!)
-                                                .child("messages")
-                                                .child(msgKey!!).removeValue()
-                                        }
+                                        .child(msgKey!!).removeValue()
                                 }
                             }.start()
                         }
