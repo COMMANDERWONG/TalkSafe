@@ -32,8 +32,7 @@ class MessageAdapter(val context: Context, val messageList: ArrayList<Message>) 
             // sent view holder
             val viewHolder = holder as SentViewHolder
 
-            if (currentMessage.timed == true)
-            {
+            if (currentMessage.timed == true) {
                 val builder = StringBuilder()
                 builder.append("[")
                     .append(currentMessage.timeLimit)
@@ -41,9 +40,7 @@ class MessageAdapter(val context: Context, val messageList: ArrayList<Message>) 
                     .append(currentMessage.message)
 
                 holder.sentMessage.text = builder.toString()
-            }
-            else
-            {
+            } else {
                 holder.sentMessage.text = currentMessage.message
             }
         } else {
