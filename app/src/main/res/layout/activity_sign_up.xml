@@ -16,9 +16,19 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
+        android:textColor="@color/blue3"
         android:text="Sign Up"
         android:textAlignment="center"
         android:textSize="40sp" />
+
+    <EditText
+        android:id="@+id/t_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:layout_marginTop="120dp"
+        android:hint="Username"
+        android:minHeight="48dp" />
 
     <EditText
         android:id="@+id/t_email"
@@ -29,14 +39,6 @@
         android:hint="Email"
         android:minHeight="48dp" />
 
-    <EditText
-        android:id="@+id/t_username"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/title"
-        android:layout_marginTop="10dp"
-        android:hint="Username"
-        android:minHeight="48dp" />
 
     <EditText
         android:id="@+id/t_password"
@@ -48,13 +50,16 @@
         android:inputType="textPassword"
         android:minHeight="48dp" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/b_signUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/t_password"
         android:layout_centerInParent="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/purple_shape"
+        android:textColor="@color/white"
         android:text="Sign Up"
         android:textAlignment="center" />
+
 </RelativeLayout>
