@@ -255,9 +255,17 @@ class Chat : AppCompatActivity() {
                             // Close the stream
                             fos.close()
                         } catch (e: FileNotFoundException) {
-                            e.printStackTrace()
+                            Toast.makeText(
+                                this@Chat,
+                                e.printStackTrace().toString(),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         } catch (e: IOException) {
-                            e.printStackTrace()
+                            Toast.makeText(
+                                this@Chat,
+                                e.printStackTrace().toString(),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                         Toast.makeText(
                             this@Chat,
@@ -269,7 +277,7 @@ class Chat : AppCompatActivity() {
             } else {
                 Toast.makeText(
                     this@Chat,
-                    "There's no chat to be exported",
+                    "There's no message to be exported",
                     Toast.LENGTH_SHORT
                 ).show()
             }

@@ -85,17 +85,22 @@ class MainActivity : AppCompatActivity() {
                 if (ps.email == email) {
                     userList.remove(ps)
                     mDbRef.child("user").child(mAuth.uid!!).child("friends").setValue(userList)
+                    Toast.makeText(
+                        this@MainActivity,
+                        ps.name+" removed from your friend list",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
             adapter.notifyDataSetChanged()
+
 
         } else {
             Toast.makeText(
                 this@MainActivity,
                 "This user is not in your friend list",
                 Toast.LENGTH_SHORT
-            )
-                .show()
+            ).show()
         }
     }
 
@@ -124,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                                         .setValue(userList)
                                     Toast.makeText(
                                         this@MainActivity,
-                                        "Friend " + chkUser.name + " added to your friend list successfully",
+                                        chkUser.name + " added to your friend list",
                                         Toast.LENGTH_SHORT
                                     )
                                         .show()
@@ -198,6 +203,12 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Database Error",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
                 }
             })
     }
