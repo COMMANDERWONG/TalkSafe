@@ -40,16 +40,28 @@
         android:minHeight="48dp" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/b_forget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/b_signUp"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/purple_shape"
+        android:text="Forget Password"
+        android:textAlignment="center"
+        android:textColor="@color/white" />
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/b_logIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/t_password"
         android:layout_centerInParent="true"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/purple_shape"
-        android:textColor="@color/white"
-        android:text="Log In"
-        android:textAlignment="center" />
+        android:text="Login"
+        android:textAlignment="center"
+        android:textColor="@color/white" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/b_signUp"
@@ -59,8 +71,8 @@
         android:layout_centerInParent="true"
         android:layout_marginTop="30dp"
         android:background="@drawable/purple_shape"
-        android:textColor="@color/white"
         android:text="Sign Up"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        android:textColor="@color/white" />
 
 </RelativeLayout>

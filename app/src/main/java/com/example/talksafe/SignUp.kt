@@ -1,14 +1,16 @@
 package com.example.talksafe
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+
 
 class SignUp : AppCompatActivity() {
     private lateinit var tEmail: EditText
@@ -52,7 +54,19 @@ class SignUp : AppCompatActivity() {
                     } else if (password.length < 6) {
                         Toast.makeText(
                             this@SignUp,
-                            "Password must consists at least 6 characters",
+                            "Password must consist at least 6 characters",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else if (!isValidEmail(email)){
+                        Toast.makeText(
+                            this@SignUp,
+                            "Please enter a valid email",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            this@SignUp,
+                            "This email is already used by another account",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -64,6 +78,10 @@ class SignUp : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+    }
+
+    private fun isValidEmail(target: CharSequence?): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(target).matches()
     }
 
     private fun addToDatabase(name: String, email: String, uid: String) {
