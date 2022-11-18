@@ -86,7 +86,7 @@ class Chat : AppCompatActivity() {
                         val msgID = ps.key.toString()
                         msgList.add(msg!!)
 
-                        if (msg.timed == true && msgCountDown == 0) {
+                        if (msg.timed == true && msgCountDown == 0 && msg.senderID == RID) {
                             val temp = msg.timeLimit!!.toLong().times(1000)
                             msgCountDown = msg.timeLimit!!.toInt()
                             isTimeLimitSet = true
@@ -129,14 +129,8 @@ class Chat : AppCompatActivity() {
             val timer = msgTimer.text.toString()
 
             if (message.isNotEmpty()) {
-                if (isTimeLimitSet && timer.isNotEmpty()) {
-                    Toast.makeText(
-                        this@Chat,
-                        "Only one time-limited message can be active",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    msgTimer.setText("")
-                } else if (!timer.isDigitsOnly()) {
+
+                if (!timer.isDigitsOnly()) {
                     Toast.makeText(
                         this@Chat,
                         "Only accept integer input",
@@ -152,17 +146,16 @@ class Chat : AppCompatActivity() {
                     msgTimer.setText("")
                 } else {
                     val messageObj = Message(message, SID, false)
-
                     if (timer.isNotEmpty()) {
                         messageObj.timed = true
                         messageObj.timeLimit = timer.toInt()
                     }
-
                     mDbRef.child("chat").child(senderRoom!!).child("messages").push()
                         .setValue(messageObj).addOnSuccessListener {
                             mDbRef.child("chat").child(receiverRoom!!).child("messages").push()
                                 .setValue(messageObj)
                         }
+
                     msgBox.setText("")
                     msgTimer.setText("")
                 }
