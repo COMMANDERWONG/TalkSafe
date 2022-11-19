@@ -219,7 +219,7 @@ class Chat : AppCompatActivity() {
 
         var meg: String
         var fileContent = ""
-        mDbRef.child("chat").child(receiverRoom!!).child("messages").get().addOnSuccessListener {
+        mDbRef.child("chat").child(senderRoom!!).child("messages").get().addOnSuccessListener {
             if (it.exists()) {
                 for (ps in it.children) {
 
