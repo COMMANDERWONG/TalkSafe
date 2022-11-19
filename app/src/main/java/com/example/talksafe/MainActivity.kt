@@ -105,12 +105,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkAddFriend(email: String) {
-        var exist = true
+        var exist = false
         if (checkInput(email)) {
             mDbRef.child("user")
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        exist = false
                         for (ps in snapshot.children) {
                             val chkUser = ps.getValue(User::class.java)
                             if (chkUser?.email == email) {
