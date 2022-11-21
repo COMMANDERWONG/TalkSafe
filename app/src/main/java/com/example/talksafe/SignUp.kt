@@ -16,9 +16,11 @@ class SignUp : AppCompatActivity() {
     private lateinit var tEmail: EditText
     private lateinit var tPassword: EditText
     private lateinit var tUsername: EditText
+    private lateinit var tRePassword: EditText
     private lateinit var bSignUp: Button
     private lateinit var mAuth: FirebaseAuth
     private lateinit var mDbRef: DatabaseReference
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,21 +30,24 @@ class SignUp : AppCompatActivity() {
         tEmail = findViewById(R.id.t_email)
         tPassword = findViewById(R.id.t_password)
         tUsername = findViewById(R.id.t_username)
+        tRePassword = findViewById(R.id.t_repassword)
         bSignUp = findViewById(R.id.b_signUp)
 
         bSignUp.setOnClickListener {
             val name = tUsername.text.toString()
             val email = tEmail.text.toString()
             val password = tPassword.text.toString()
-            signUp(name, email, password)
+            val repassword = tRePassword.text.toString()
+            signUp(name, email, password, repassword)
         }
 
 
     }
 
-    private fun signUp(name: String, email: String, password: String) {
-
-        if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
+    private fun signUp(name: String, email: String, password: String, repassword: String) {
+        val pwMatch = passwordMatch(password, repassword)
+        if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && repassword.isNotEmpty() && pwMatch
+        ) {
             mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
@@ -57,7 +62,7 @@ class SignUp : AppCompatActivity() {
                             "Password must consist at least 6 characters",
                             Toast.LENGTH_SHORT
                         ).show()
-                    } else if (!isValidEmail(email)){
+                    } else if (!isValidEmail(email)) {
                         Toast.makeText(
                             this@SignUp,
                             "Please enter a valid email",
@@ -71,6 +76,13 @@ class SignUp : AppCompatActivity() {
                         ).show()
                     }
                 }
+        } else if (!pwMatch) {
+            Toast.makeText(
+                this@SignUp,
+                "Password do not match",
+                Toast.LENGTH_SHORT
+            ).show()
+
         } else {
             Toast.makeText(
                 this@SignUp,
@@ -78,6 +90,11 @@ class SignUp : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+    }
+
+
+    private fun passwordMatch(password: String, repassword: String): Boolean {
+        return password.equals(repassword)
     }
 
     private fun isValidEmail(target: CharSequence?): Boolean {

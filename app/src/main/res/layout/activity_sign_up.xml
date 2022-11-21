@@ -50,6 +50,16 @@
         android:inputType="textPassword"
         android:minHeight="48dp" />
 
+    <EditText
+        android:id="@+id/t_repassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/t_password"
+        android:layout_marginTop="10dp"
+        android:hint="Re-enter Password"
+        android:inputType="textPassword"
+        android:minHeight="48dp" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/b_signUp"
         android:layout_width="wrap_content"
