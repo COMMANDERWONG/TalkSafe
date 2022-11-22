@@ -269,7 +269,7 @@ class Chat : AppCompatActivity() {
                         }
                         Toast.makeText(
                             this@Chat,
-                            "Information saved to SD card",
+                            "Information saved",
                             Toast.LENGTH_SHORT
                         ).show()
                     }

@@ -105,11 +105,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkAddFriend(email: String) {
-        var exist = false
         if (checkInput(email)) {
             mDbRef.child("user")
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
+                        var exist = false
                         for (ps in snapshot.children) {
                             val chkUser = ps.getValue(User::class.java)
                             if (chkUser?.email == email) {
@@ -138,6 +138,14 @@ class MainActivity : AppCompatActivity() {
                             }
 
                         }
+                        if(!exist){
+                            Toast.makeText(
+                                this@MainActivity,
+                                "No user found with this email",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        }
                     }
 
                     override fun onCancelled(error: DatabaseError) {
@@ -151,14 +159,7 @@ class MainActivity : AppCompatActivity() {
                 })
         }
 
-        if (!exist) {
-            Toast.makeText(
-                this@MainActivity,
-                "No user found with this email",
-                Toast.LENGTH_SHORT
-            )
-                .show()
-        }
+
 
     }
 
