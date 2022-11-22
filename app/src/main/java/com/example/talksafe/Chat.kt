@@ -212,7 +212,6 @@ class Chat : AppCompatActivity() {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val formatted = current.format(formatter)
         val filename = "$formatted.txt"
-        val filepath = "/messages"
 
 
         val list = ArrayList<String>()
@@ -243,7 +242,7 @@ class Chat : AppCompatActivity() {
                 )
                 if (isStoragePermissionGranted()) {
                     if (fileContent != "") {
-                        val myExternalFile = File(getExternalFilesDir(filepath), filename)
+                        val myExternalFile = File(getExternalFilesDir(null), filename)
                         val fos: FileOutputStream?
                         try {
                             // Instantiate the FileOutputStream object and pass myExternalFile in constructor
